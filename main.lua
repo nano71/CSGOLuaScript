@@ -23,20 +23,60 @@ m4a1 = { { x = 0, y = 0, d = 5 }, { x = 0, y = 0, d = 5 }, { x = 0, y = 0, d = 5
 indexWeapon = 0
 indexPattern = 1
 
-
 flag = 0
 activate = 1
 timestart = 0
 Wpattern = { ak47, galil, sg553, m4a4, m4a1, famas, aug }
 Wkey1 = { ak47key, galilkey, sg553key, m4a4key, m4a1key, famaskey, augkey }
-EnablePrimaryMouseButtonEvents(true)
 function OnEvent(event, arg)
-    OutputLogMessage("Event: "..event.." Arg: "..arg.." Activate: "..activate.."\n")
+    OutputLogMessage("\nEvent: " .. event .. " Arg: " .. arg .. " Activate: " .. activate .. "\n")
     --Hold the left mouse button
+    if (event == "MOUSE_BUTTON_RELEASED") then
+        indexPattern = 1
+    end
+    if (event == "MOUSE_BUTTON_PRESSED") then
+        OutputLogMessage("\nMOUSE_BUTTON_PRESSED")
+        EnablePrimaryMouseButtonEvents(true)
+
+        if (arg == offkey) then
+            indexWeapon = 0
+            OutputLogMessage("\n OFF")
+            activate = 0
+        elseif (arg > 2) then
+            ClearLog()
+            activate = 1
+            if (arg == Wkey1[2]) then
+                indexWeapon = 2
+                OutputLogMessage("\n GALIL")
+            end
+            if (arg == Wkey1[5]) then
+                indexWeapon = 5
+                OutputLogMessage("\n M4A1")
+            end
+            if (arg == Wkey1[6]) then
+                indexWeapon = 6
+                OutputLogMessage("\n FAMAS")
+            end
+            if (arg == Wkey1[7]) then
+                indexWeapon = 7
+                OutputLogMessage("\n AUG")
+            end
+            Sleep(100)
+        end
+        Move()
+        OutputLogMessage("\nMOUSE_BUTTON_PRESSED END")
+
+    end
+end
+
+function Move()
+    OutputLogMessage("\nMove")
     while IsMouseButtonPressed(1) and activate == 1 do
+        ClearLog()
+        OutputLogMessage("\nwhile")
         if (indexWeapon == 17) then
             SetMKeyState(3)
-            OutputLogMessage(" break")
+            OutputLogMessage("\n break")
             break
         end
         if (indexWeapon > 0 and indexWeapon < 17) then
@@ -50,59 +90,12 @@ function OnEvent(event, arg)
                 indexPattern = indexPattern + 1
             else
                 ClearLog()
-                OutputLogMessage(" end")
-                activate = 0
+                OutputLogMessage("\n end")
+                --activate = 0
             end
-        end
-    end
-    if (event == "MOUSE_BUTTON_RELEASED") then
-        indexPattern = 1
-    end
-    if (event == "MOUSE_BUTTON_PRESSED") then
-        if (arg == offkey) then
-            indexWeapon = 0
-            OutputLogMessage(" OFF")
-            activate = 0
-            if IsKeyLockOn("scrolllock") then
-                PressAndReleaseKey("scrolllock")
-                OutputLogMessage(" --  scrolllock")
-            end
-        elseif (arg > 2) then
-
-            ClearLog()
-            activate = 1
-            if (arg == Wkey1[2]) then
-                indexWeapon = 2
-                flag = 1
-                OutputLogMessage(" GALIL")
-            end
-            if (arg == Wkey1[5]) then
-                indexWeapon = 5
-                flag = 1
-                OutputLogMessage(" M4A1")
-            end
-            if (arg == Wkey1[6]) then
-                indexWeapon = 6
-                flag = 1
-                OutputLogMessage(" FAMAS")
-            end
-            if (arg == Wkey1[7]) then
-                indexWeapon = 7
-                flag = 1
-                OutputLogMessage(" AUG")
-            end
-            if (not IsKeyLockOn("scrolllock")) and flag == 1 then
-                PressAndReleaseKey("scrolllock")
-                OutputLogMessage(" --  not scrolllock")
-                flag = 0
-            end
-
-            Sleep(100)
         end
     end
 end
-
-
 function Sleep3(time)
     while (time > GetRunningTime())
     do
